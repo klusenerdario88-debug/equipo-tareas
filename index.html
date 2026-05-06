@@ -1579,6 +1579,35 @@ function formatDate(iso) { if(!iso) return ''; const [y,m,d]=iso.split('-'); ret
 function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 load();
+
+// Exponer funciones al scope global (necesario por type="module")
+window.openProfile = openProfile;
+window.showCreate = showCreate;
+window.openFinances = openFinances;
+window.goHome = goHome;
+window.openMenu = openMenu;
+window.closeOverlay = closeOverlay;
+window.handleOverlayClick = handleOverlayClick;
+window.switchView = switchView;
+window.toggleForm = toggleForm;
+window.cancelForm = cancelForm;
+window.saveFromForm = saveFromForm;
+window.toggleTask = toggleTask;
+window.prepareEdit = prepareEdit;
+window.confirmDeleteTask = confirmDeleteTask;
+window.openEditProfile = openEditProfile;
+window.cancelEditProfile = cancelEditProfile;
+window.saveEditProfile = saveEditProfile;
+window.selectEditCol = selectEditCol;
+window.selectCol = selectCol;
+window.confirmDeleteProfile = confirmDeleteProfile;
+window.toggleFinanceForm = toggleFinanceForm;
+window.saveFinance = saveFinance;
+window.confirmDeleteFinance = confirmDeleteFinance;
+window.setFinFilter = setFinFilter;
+window.closeModal = closeModal;
+window.handleModalBg = handleModalBg;
+window.createProfile = createProfile;
 </script>
 </body>
 </html>
