@@ -28,13 +28,37 @@
     --mono:     'DM Mono', monospace;
     --shadow:   0 4px 24px rgba(0,0,0,0.4);
     --shadow2:  0 2px 8px rgba(0,0,0,0.3);
+    --body-bg:  #050E12;
+  }
+
+
+  /* ─── MODO CLARO ─────────────────────────────── */
+  body.light {
+    --bg:       #F0F6F8;
+    --bg2:      #FFFFFF;
+    --bg3:      #E4EEF2;
+    --border:   #C8DDE5;
+    --border2:  #A8C8D5;
+    --muted:    #8AAAB8;
+    --sub:      #5A8090;
+    --text:     #2A4A58;
+    --bright:   #0F2229;
+    --accent:   #2BB5AB;
+    --accent2:  #1E9E94;
+    --danger:   #D04040;
+    --success:  #2A9A52;
+    --warn:     #C07830;
+    --body-bg:  #D8EAF0;
+    --shadow:   0 4px 24px rgba(0,0,0,0.1);
+    --shadow2:  0 2px 8px rgba(0,0,0,0.08);
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
     font-family: var(--font);
-    background: #050E12;
+    background: var(--body-bg);
+    transition: background 0.3s, color 0.3s;
     color: var(--text);
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
@@ -812,6 +836,55 @@
   .mini-stat-val { font-size: 15px; font-weight: 600; font-family: var(--mono); color: var(--bright); }
   .mini-stat-label { font-size: 10px; color: var(--muted); margin-top: 2px; letter-spacing: 0.5px; }
 
+
+
+  /* ─── THEME TOGGLE ───────────────────────────── */
+  .theme-toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 8px; border-radius: var(--radius);
+  }
+  .theme-toggle-label { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text); }
+  .toggle-switch {
+    width: 40px; height: 22px; background: var(--border2); border-radius: 99px;
+    position: relative; cursor: pointer; transition: background 0.25s; flex-shrink: 0;
+    border: none;
+  }
+  .toggle-switch.on { background: var(--accent); }
+  .toggle-switch::after {
+    content: ''; position: absolute; top: 3px; left: 3px;
+    width: 16px; height: 16px; background: white; border-radius: 50%;
+    transition: transform 0.25s; box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+  .toggle-switch.on::after { transform: translateX(18px); }
+
+  /* ─── DEBT PANEL ─────────────────────────────── */
+  .debt-panel {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius2);
+    padding: 14px 16px; margin-bottom: 12px;
+  }
+  .debt-panel-title { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .debt-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; flex-wrap: wrap; }
+  .debt-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .debt-balanced { font-size: 13px; color: var(--success); display: flex; align-items: center; gap: 6px; }
+  .debt-person-stats { display: flex; gap: 8px; margin-bottom: 10px; }
+  .debt-person-card { flex: 1; background: var(--bg3); border-radius: var(--radius); padding: 8px 10px; border: 1px solid var(--border); }
+  .debt-person-name { font-size: 10px; color: var(--muted); letter-spacing: 0.5px; margin-bottom: 2px; }
+  .debt-person-amount { font-size: 15px; font-weight: 600; font-family: var(--mono); color: var(--bright); }
+
+  /* ─── CATEGORY ICON TX ───────────────────────── */
+  .tx-cat-icon { width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+  .tx-cat-icon.out { background: rgba(224,92,92,0.1); }
+  .tx-cat-icon.in  { background: rgba(82,201,122,0.1); }
+
+  /* ─── TYPE FILTER BAR ─────────────────────────── */
+  .fin-filter-type-bar { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+
+  /* ─── CONFETTI ───────────────────────────────── */
+  #confetti-canvas {
+    position: absolute; inset: 0; pointer-events: none; z-index: 500;
+    border-radius: inherit;
+  }
+
   /* ─── LOADING SCREEN ────────────────────────── */
   #loading-screen {
     position: absolute;
@@ -837,6 +910,8 @@
 </head>
 <body>
 <div class="app">
+
+  <canvas id="confetti-canvas"></canvas>
 
   <!-- LOADING -->
   <div id="loading-screen">
@@ -868,6 +943,14 @@
       <div class="menu-item" onclick="showCreate();closeOverlay();">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
         Nuevo perfil
+      </div>
+      <hr class="menu-divider">
+      <div class="theme-toggle-row">
+        <div class="theme-toggle-label">
+          <span id="theme-icon">🌙</span>
+          <span id="theme-label">Modo oscuro</span>
+        </div>
+        <button class="toggle-switch" id="theme-toggle" onclick="toggleTheme()"></button>
       </div>
       <hr class="menu-divider">
       <div id="menu-edit-section"></div>
@@ -967,8 +1050,8 @@
           </div>
         </div>
 
-        <!-- Mini stats por persona -->
-        <div id="person-stats-row" class="mini-stats-row" style="display:none;"></div>
+        <!-- Panel Saldar Cuentas -->
+        <div id="debt-panel" class="debt-panel" style="display:none;"></div>
 
         <button onclick="toggleFinanceForm()" style="width:100%; padding:13px; background:var(--bg2); border:1px dashed var(--border2); color:var(--accent); border-radius:var(--radius2); margin-bottom:14px; cursor:pointer; font-family:var(--font); font-size:14px; font-weight:600; transition:background 0.15s;">
           + Nuevo movimiento
@@ -980,7 +1063,18 @@
               <option value="out">🔴 Gasto</option>
               <option value="in">🟢 Ingreso</option>
             </select>
-            <input type="number" id="fin-amount" placeholder="Monto" min="0" step="0.01"/>
+            <select id="fin-cat">
+              <option value="🛒">🛒 Supermercado</option>
+              <option value="⚡">⚡ Servicios</option>
+              <option value="🍔">🍔 Comida/Ocio</option>
+              <option value="📚">📚 Educación</option>
+              <option value="🚗">🚗 Transporte</option>
+              <option value="🏠">🏠 Hogar</option>
+              <option value="💊">💊 Salud</option>
+              <option value="💰">💰 Otro</option>
+            </select>
+          </div>
+          <input type="number" id="fin-amount" placeholder="Monto" min="0" step="0.01"/>
           </div>
           <input type="text" id="fin-desc" placeholder="Descripción…"/>
           <div class="form-row">
@@ -998,6 +1092,7 @@
         </div>
 
         <div class="fin-filter-bar" id="fin-filter-bar"></div>
+        <div class="fin-filter-type-bar" id="fin-filter-type-bar"></div>
 
         <div class="tx-list" id="finance-list">
           <div style="text-align:center; padding:30px 20px; font-size:13px; color:var(--muted);">No hay movimientos.</div>
@@ -1109,13 +1204,67 @@ let selectedColor = 0;
 let editingTaskId = null;
 let editSelectedColor = 0;
 let financeFilter = 'all';
+let financeTypeFilter = 'all';
 let pendingConfirm = null;
 let isSaving = false;
 let saveQueue = false;
 
+
+/* ─── TEMA ───────────────────────────────────── */
+function initTheme() {
+  const saved = localStorage.getItem('theme');
+  if (saved === 'light') applyTheme(true, false);
+}
+function applyTheme(light, save = true) {
+  document.body.classList.toggle('light', light);
+  const btn = document.getElementById('theme-toggle');
+  const icon = document.getElementById('theme-icon');
+  const label = document.getElementById('theme-label');
+  if (btn) btn.classList.toggle('on', light);
+  if (icon) icon.textContent = light ? '☀️' : '🌙';
+  if (label) label.textContent = light ? 'Modo claro' : 'Modo oscuro';
+  if (save) localStorage.setItem('theme', light ? 'light' : 'dark');
+}
+function toggleTheme() {
+  applyTheme(!document.body.classList.contains('light'));
+}
+
+/* ─── CONFETTI ───────────────────────────────── */
+function launchConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  const app = canvas.parentElement;
+  canvas.width = app.offsetWidth;
+  canvas.height = app.offsetHeight;
+  const pieces = Array.from({length: 80}, () => ({
+    x: Math.random() * canvas.width, y: -10 - Math.random() * 40,
+    r: 4 + Math.random() * 6, d: 2 + Math.random() * 3,
+    color: ['#4ECDC4','#FFE66D','#FF6B6B','#95D5B2','#C080D4','#80C4D4'][Math.floor(Math.random()*6)],
+    tiltAngle: 0, tiltSpeed: 0.05 + Math.random() * 0.1, opacity: 1
+  }));
+  let frame = 0;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      p.tiltAngle += p.tiltSpeed; p.y += p.d;
+      const tilt = Math.sin(p.tiltAngle) * 12;
+      if (frame > 80) p.opacity -= 0.015;
+      ctx.globalAlpha = Math.max(0, p.opacity);
+      ctx.beginPath(); ctx.fillStyle = p.color;
+      ctx.ellipse(p.x, p.y, p.r/2, p.r, (tilt * Math.PI) / 180, 0, 2*Math.PI);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1; frame++;
+    if (frame < 160) requestAnimationFrame(draw);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  draw();
+}
+
 /* ─── FIREBASE SYNC ──────────────────────────── */
 async function load() {
   showLoading(true);
+  initTheme();
   try {
     // Cargar datos iniciales
     const [pSnap, fSnap] = await Promise.all([
@@ -1358,9 +1507,11 @@ function updatePreview() {
 async function createProfile() {
   const name = document.getElementById('create-name').value.trim();
   if(!name) { showToast('Escribí un nombre'); return; }
+  isSaving = true;
   profiles.push({id: Date.now(), name, colorIdx: selectedColor, tasks:{monthly:[],weekly:[],daily:[]}});
-  await save(); goHome();
-  showToast(`Perfil de ${name} creado`);
+  try { await setDoc(DOC_PROFILES, {list: profiles}); } catch(e) { showToast('❌ Error al guardar'); }
+  isSaving = false;
+  goHome(); showToast(`Perfil de ${name} creado 🎉`);
 }
 
 /* ─── TAREAS ─────────────────────────────────── */
@@ -1422,7 +1573,11 @@ async function toggleTask(id) {
   const t = viewingProfile.tasks[currentView].find(x => x.id === id);
   t.done = !t.done;
   await save(); renderTasks();
-  if(t.done) showToast('Tarea completada ✓');
+  if(t.done) {
+    showToast('Tarea completada ✓');
+    const dailyTasks = viewingProfile.tasks['daily'];
+    if(currentView === 'daily' && dailyTasks.length > 0 && dailyTasks.every(x => x.done)) launchConfetti();
+  }
 }
 function confirmDeleteTask(id) {
   const t = viewingProfile.tasks[currentView].find(x => x.id === id);
@@ -1505,6 +1660,7 @@ async function saveFinance() {
   finances.push({
     id: Date.now(),
     type: document.getElementById('fin-type').value,
+    cat: document.getElementById('fin-cat') ? document.getElementById('fin-cat').value : '💰',
     amount, desc,
     whoId: document.getElementById('fin-who').value,
     date: document.getElementById('fin-date').value||new Date().toISOString().split('T')[0]
@@ -1518,6 +1674,45 @@ function deleteFinance(id) {
     await save(); renderFinances(); showToast('Movimiento eliminado');
   });
 }
+/* ─── PANEL SALDAR CUENTAS ───────────────────── */
+function renderDebtPanel() {
+  const panel = document.getElementById('debt-panel');
+  const gastos = finances.filter(f => f.type === 'out');
+  if (gastos.length === 0 || profiles.length < 2) { panel.style.display = 'none'; return; }
+  const spent = {};
+  profiles.forEach(p => { spent[p.id] = 0; });
+  gastos.forEach(f => {
+    const match = profiles.find(p => String(p.id) === String(f.whoId));
+    if (match) spent[match.id] += f.amount;
+  });
+  const total = Object.values(spent).reduce((a,b) => a+b, 0);
+  const avg = total / profiles.length;
+  const balance = {};
+  profiles.forEach(p => { balance[p.id] = spent[p.id] - avg; });
+  const debts = [];
+  const payers = profiles.filter(p => balance[p.id] < -0.01);
+  const receivers = profiles.filter(p => balance[p.id] > 0.01);
+  payers.forEach(payer => {
+    let owed = Math.abs(balance[payer.id]);
+    receivers.forEach(receiver => {
+      if (owed < 0.01 || balance[receiver.id] <= 0) return;
+      const transfer = Math.min(owed, balance[receiver.id]);
+      debts.push({from: payer.name, to: receiver.name, amount: transfer});
+      owed -= transfer;
+    });
+  });
+  panel.style.display = 'block';
+  const personCards = profiles.map(p =>
+    `<div class="debt-person-card"><div class="debt-person-name">${escHtml(p.name).toUpperCase()}</div><div class="debt-person-amount">$${formatAmount(spent[p.id])}</div></div>`
+  ).join('');
+  const debtContent = debts.length === 0
+    ? `<div class="debt-balanced">✅ Las cuentas están equilibradas</div>`
+    : debts.map(d =>
+        `<div class="debt-row"><span style="color:var(--bright);font-weight:500;">${escHtml(d.from)}</span><span style="color:var(--warn);">→</span><span>le debe</span><span style="color:var(--warn);font-weight:600;font-family:var(--mono);">$${formatAmount(d.amount)}</span><span>a ${escHtml(d.to)}</span></div>`
+      ).join('');
+  panel.innerHTML = `<div class="debt-panel-title">💰 Saldar cuentas · Promedio $${formatAmount(avg)}</div><div class="debt-person-stats">${personCards}</div>${debtContent}`;
+}
+
 function renderFinances() {
   let totalIn=0, totalOut=0;
   finances.forEach(f => { if(f.type==='in') totalIn+=f.amount; else totalOut+=f.amount; });
@@ -1528,24 +1723,23 @@ function renderFinances() {
   document.getElementById('bal-in').textContent  = '+$'+formatAmount(totalIn);
   document.getElementById('bal-out').textContent = '-$'+formatAmount(totalOut);
 
-  const statsRow = document.getElementById('person-stats-row');
-  if(finances.length>0) {
-    statsRow.style.display='flex';
-    statsRow.innerHTML = profiles.map(p => {
-      const pOut = finances.filter(f=>f.type==='out'&&String(f.whoId)===String(p.id)).reduce((s,f)=>s+f.amount,0);
-      return `<div class="mini-stat"><div class="mini-stat-val">$${formatAmount(pOut)}</div><div class="mini-stat-label">${p.name}</div></div>`;
-    }).join('');
-  } else { statsRow.style.display='none'; }
+  renderDebtPanel();
 
   const filterBar = document.getElementById('fin-filter-bar');
   filterBar.innerHTML = [
     {id:'all',label:'Todos'},
     ...profiles.map(p=>({id:String(p.id),label:p.name})),
     {id:'common',label:'Común'}
-  ].map(f=>`<button class="filter-chip ${financeFilter===f.id?'active':''}" onclick="setFinFilter('${f.id}')">${f.label}</button>`).join('');
+  ].map(f=>`<button class="filter-chip ${financeFilter===f.id?'active':''}" onclick="setFinFilter('${f.id}')">${escHtml(f.label)}</button>`).join('');
+
+  const typeBar = document.getElementById('fin-filter-type-bar');
+  typeBar.innerHTML = [
+    {id:'all',label:'Todos'},{id:'in',label:'🟢 Ingresos'},{id:'out',label:'🔴 Gastos'}
+  ].map(f=>`<button class="filter-chip ${financeTypeFilter===f.id?'active':''}" onclick="setFinTypeFilter('${f.id}')">${f.label}</button>`).join('');
 
   let filtered = [...finances];
   if(financeFilter!=='all') filtered=filtered.filter(f=>String(f.whoId)===financeFilter);
+  if(financeTypeFilter!=='all') filtered=filtered.filter(f=>f.type===financeTypeFilter);
   filtered.reverse();
 
   const list = document.getElementById('finance-list');
@@ -1557,12 +1751,13 @@ function renderFinances() {
     const profile = profiles.find(p=>String(p.id)===String(f.whoId));
     const whoName = profile?profile.name:'Común';
     const isOut = f.type==='out';
+    const cat = f.cat || '💰';
     return `
     <div class="tx-item">
-      <div class="tx-dot ${isOut?'out':'in'}"></div>
+      <div class="tx-cat-icon ${isOut?'out':'in'}">${cat}</div>
       <div class="tx-info">
         <div class="tx-desc">${escHtml(f.desc)}</div>
-        <div class="tx-meta">${isOut?'Pagó':'Aportó'}: ${whoName} · ${formatDate(f.date)}</div>
+        <div class="tx-meta">${isOut?'Pagó':'Aportó'}: ${escHtml(whoName)} · ${formatDate(f.date)}</div>
       </div>
       <div class="tx-amount ${isOut?'out':'in'}">${isOut?'-':'+'}$${formatAmount(f.amount)}</div>
       <button class="tx-del" onclick="deleteFinance(${f.id})">
@@ -1572,6 +1767,7 @@ function renderFinances() {
   }).join('');
 }
 function setFinFilter(id) { financeFilter=id; renderFinances(); }
+function setFinTypeFilter(id) { financeTypeFilter=id; renderFinances(); }
 
 /* ─── HELPERS ────────────────────────────────── */
 function formatAmount(n) { return n.toLocaleString('es-AR',{minimumFractionDigits:n%1!==0?2:0}); }
@@ -1603,11 +1799,16 @@ window.selectCol = selectCol;
 window.confirmDeleteProfile = confirmDeleteProfile;
 window.toggleFinanceForm = toggleFinanceForm;
 window.saveFinance = saveFinance;
-window.confirmDeleteFinance = confirmDeleteFinance;
 window.setFinFilter = setFinFilter;
 window.closeModal = closeModal;
 window.handleModalBg = handleModalBg;
 window.createProfile = createProfile;
+window.setFinTypeFilter = setFinTypeFilter;
+window.toggleTheme = toggleTheme;
+window.handleQuickKey = handleQuickKey;
+window.updatePreview = updatePreview;
+window.updateEditPreview = updateEditPreview;
+window.deleteFinance = deleteFinance;
 </script>
 </body>
 </html>
