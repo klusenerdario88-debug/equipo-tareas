@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <title>Equipo & Finanzas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+  :root {
+    --bg:       #0A1A1F;
+    --bg2:      #0F2229;
+    --bg3:      #152C35;
+    --border:   #1E3A45;
+    --border2:  #2A4E5C;
+    --muted:    #3A6070;
+    --sub:      #5A8090;
+    --text:     #C8D4D8;
+    --bright:   #E8F0F3;
+    --accent:   #4ECDC4;
+    --accent2:  #2BB5AB;
+    --danger:   #E05C5C;
+    --success:  #52C97A;
+    --warn:     #E09840;
+    --radius:   10px;
+    --radius2:  14px;
+    --font:     'DM Sans', sans-serif;
+    --mono:     'DM Mono', monospace;
+    --shadow:   0 4px 24px rgba(0,0,0,0.4);
+    --shadow2:  0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: #050E12;
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ─── LAYOUT APP ─────────────────────────────── */
+  .app {
+    width: 100%;
+    height: 100dvh;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  @media (min-width: 768px) {
+    body {
+      background: #020A0D;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .app {
+      max-width: 480px;
+      height: 88vh;
+      min-height: 640px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px var(--border);
+      overflow: hidden;
+    }
+  }
+
+  /* ─── SCREENS ────────────────────────────────── */
+  .screen {
+    display: none;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+  }
+  .screen.active {
+    display: flex;
+    animation: screenIn 0.25s cubic-bezier(0.22,1,0.36,1);
+  }
+  @keyframes screenIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── SCROLLABLE AREAS ───────────────────────── */
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .scroll-area::-webkit-scrollbar { width: 3px; }
+  .scroll-area::-webkit-scrollbar-track { background: transparent; }
+  .scroll-area::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+
+  /* ─── HEADER COMÚN ───────────────────────────── */
+  .page-header {
+    padding: 1.1rem 1.25rem 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .page-title {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--sub);
+  }
+
+  /* ─── BOTONES BASE ───────────────────────────── */
+  .btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--sub);
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+    flex-shrink: 0;
+  }
+  .btn-icon:hover { background: var(--bg3); color: var(--bright); }
+  .btn-icon svg { pointer-events: none; }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 11px 20px;
+    border-radius: var(--radius);
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-primary:active { transform: scale(0.97); }
+
+  .btn-ghost {
+    background: none;
+    border: none;
+    color: var(--sub);
+    font-family: var(--font);
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+  }
+  .btn-ghost:hover { color: var(--text); background: var(--bg3); }
+
+  /* ─── INPUTS ─────────────────────────────────── */
+  input, select, textarea {
+    font-family: var(--font);
+    font-size: 14px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    color: var(--bright);
+    border-radius: var(--radius);
+    padding: 11px 14px;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  input::placeholder, textarea::placeholder { color: var(--muted); }
+  input[type="date"] { color-scheme: dark; }
+  select option { background: var(--bg2); }
+
+  /* ─── BOTTOM NAV ─────────────────────────────── */
+  .bottom-nav {
+    border-top: 1px solid var(--border);
+    display: flex;
+    padding: 6px 12px;
+    gap: 4px;
+    background: var(--bg);
+    flex-shrink: 0;
+  }
+  .nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 8px 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: var(--radius);
+    color: var(--muted);
+    font-family: var(--font);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: color 0.2s, background 0.2s;
+    position: relative;
+  }
+  .nav-btn.active {
+    color: var(--accent);
+    background: rgba(78,205,196,0.08);
+  }
+  .nav-btn svg { transition: transform 0.2s; }
+  .nav-btn.active svg { transform: scale(1.1); }
+
+  /* ─── TOAST ──────────────────────────────────── */
+  #toast {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    padding: 10px 20px;
+    border-radius: 99px;
+    font-size: 13px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s, transform 0.25s;
+    white-space: nowrap;
+    z-index: 200;
+    box-shadow: var(--shadow);
+  }
+  #toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ─── OVERLAY / MENÚ ─────────────────────────── */
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    display: none;
+    z-index: 100;
+    backdrop-filter: blur(2px);
+  }
+  .overlay.open { display: flex; animation: fadeIn 0.2s; }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+  .side-menu {
+    background: var(--bg2);
+    width: 260px;
+    height: 100%;
+    padding: 1.5rem 1rem;
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    animation: slideIn 0.25s cubic-bezier(0.22,1,0.36,1);
+  }
+  @keyframes slideIn {
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(0); }
+  }
+  .side-menu h3 {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    padding: 0 8px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 8px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text);
+    transition: background 0.15s;
+  }
+  .menu-item:hover { background: var(--bg3); }
+  .menu-item.danger { color: var(--danger); }
+  .menu-divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+
+  /* ─── HOME / PERFILES ────────────────────────── */
+  .profiles-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 1rem 1.25rem;
+  }
+  .profile-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius2);
+    padding: 1.25rem 1rem;
+    cursor: pointer;
+    background: var(--bg2);
+    transition: border-color 0.2s, transform 0.15s, background 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+    position: relative;
+  }
+  .profile-card:hover {
+    border-color: var(--border2);
+    background: var(--bg3);
+    transform: translateY(-2px);
+  }
+  .profile-card.add-card {
+    border-style: dashed;
+    border-color: var(--border);
+    background: transparent;
+    color: var(--muted);
+  }
+  .profile-card.add-card:hover { border-color: var(--accent); color: var(--accent); }
+
+  .avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .profile-name { font-size: 14px; font-weight: 600; color: var(--bright); }
+  .profile-stats { font-size: 11px; color: var(--muted); }
+
+  .progress-bar {
+    width: 100%;
+    height: 3px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: var(--accent);
+    transition: width 0.4s ease;
+  }
+
+  /* ─── TASKS SCREEN ───────────────────────────── */
+  .task-header {
+    padding: 0.9rem 1rem 0.9rem 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .profile-mini {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+  .task-header-name { font-size: 16px; font-weight: 600; color: var(--bright); }
+  .task-header-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+  .view-tabs {
+    display: flex;
+    gap: 6px;
+    padding: 0.75rem 1.25rem;
+    flex-shrink: 0;
+  }
+  .vtab {
+    flex: 1;
+    padding: 8px 4px;
+    border: 1px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    border-radius: var(--radius);
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--sub);
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .vtab:hover { background: var(--bg3); color: var(--text); }
+  .vtab.active {
+    color: var(--accent);
+    background: rgba(78,205,196,0.1);
+    border-color: rgba(78,205,196,0.3);
+  }
+
+  .task-body {
+    padding: 0.75rem 1.25rem 1rem;
+  }
+
+  /* Quick add */
+  .quick-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .quick-row input {
+    flex: 1;
+    height: 42px;
+    padding: 0 14px;
+  }
+  .quick-add-btn {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    color: var(--accent);
+    font-size: 22px;
+    line-height: 1;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .quick-add-btn:hover { background: rgba(78,205,196,0.15); }
+
+  /* Form expandible */
+  .add-form {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius2);
+    padding: 14px;
+    display: grid;
+    gap: 10px;
+    margin-bottom: 14px;
+    animation: screenIn 0.2s ease;
+  }
+  .form-row { display: flex; gap: 8px; }
+  .form-row > * { flex: 1; }
+  .form-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 2px; }
+
+  /* Task items */
+  .task-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius2);
+    background: var(--bg2);
+    margin-bottom: 8px;
+    transition: border-color 0.2s, opacity 0.3s, transform 0.15s;
+    cursor: default;
+  }
+  .task-item:hover { border-color: var(--border2); }
+  .task-item.done { opacity: 0.38; }
+  .task-item.adding { animation: taskIn 0.25s cubic-bezier(0.22,1,0.36,1); }
+  @keyframes taskIn {
+    from { opacity:0; transform: translateY(-6px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  .chk {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .chk svg { opacity: 0; transition: opacity 0.15s; }
+  .task-item.done .chk svg { opacity: 1; }
+
+  .task-content { flex: 1; min-width: 0; }
+  .task-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--bright);
+    word-break: break-word;
+    line-height: 1.4;
+  }
+  .task-item.done .task-title {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+  .task-note {
+    font-size: 12px;
+    color: var(--sub);
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+  .task-meta {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 6px;
+  }
+  .task-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .task-item:hover .task-actions { opacity: 1; }
+  .task-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s, background 0.15s;
+  }
+  .task-btn:hover { color: var(--text); background: var(--bg3); }
+  .task-btn.del:hover { color: var(--danger); }
+
+  /* Tags prioridad */
+  .tag {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 99px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-family: var(--mono);
+  }
+  .tag-high { background: rgba(224,92,92,0.15); color: #E07070; border: 1px solid rgba(224,92,92,0.25); }
+  .tag-med  { background: rgba(224,152,64,0.15); color: #E09840; border: 1px solid rgba(224,152,64,0.25); }
+  .tag-low  { background: rgba(82,201,122,0.12); color: #52C97A; border: 1px solid rgba(82,201,122,0.2); }
+
+  .date-tag {
+    font-size: 11px;
+    color: var(--sub);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .date-tag.overdue { color: var(--danger); }
+
+  /* Vacío */
+  .empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--muted);
+  }
+  .empty-state .empty-icon { font-size: 36px; margin-bottom: 12px; opacity: 0.5; }
+  .empty-state p { font-size: 13px; line-height: 1.6; }
+
+  /* ─── FINANZAS ───────────────────────────────── */
+  .finance-body { padding: 1rem 1.25rem 1.25rem; }
+
+  .balance-card {
+    background: linear-gradient(135deg, var(--bg3) 0%, var(--bg2) 100%);
+    padding: 1.5rem;
+    border-radius: var(--radius2);
+    border: 1px solid var(--border2);
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .balance-card::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: rgba(78,205,196,0.06);
+  }
+  .balance-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+  .balance-amount {
+    font-size: 36px;
+    font-weight: 600;
+    color: var(--bright);
+    margin: 8px 0 14px;
+    font-family: var(--mono);
+    letter-spacing: -1px;
+  }
+  .balance-amount.positive { color: var(--bright); }
+  .balance-amount.negative { color: var(--danger); }
+
+  .balance-row {
+    display: flex;
+    gap: 12px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .bal-stat { flex: 1; }
+  .bal-stat-label { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .bal-stat-val { font-size: 16px; font-weight: 600; font-family: var(--mono); }
+  .bal-stat-val.in { color: var(--success); }
+  .bal-stat-val.out { color: var(--danger); }
+
+  .fin-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .fin-section-title { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+
+  .tx-list {
+    background: var(--bg2);
+    border-radius: var(--radius2);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .tx-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .tx-item:last-child { border-bottom: none; }
+  .tx-item:hover { background: var(--bg3); }
+
+  .tx-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .tx-dot.in { background: var(--success); }
+  .tx-dot.out { background: var(--danger); }
+
+  .tx-info { flex: 1; min-width: 0; }
+  .tx-desc { font-size: 14px; font-weight: 500; color: var(--bright); word-break: break-word; }
+  .tx-meta { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  .tx-amount { font-family: var(--mono); font-size: 14px; font-weight: 600; white-space: nowrap; }
+  .tx-amount.in  { color: var(--success); }
+  .tx-amount.out { color: var(--danger); }
+
+  .tx-del {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.15s, color 0.15s, background 0.15s;
+  }
+  .tx-item:hover .tx-del { opacity: 1; }
+  .tx-del:hover { color: var(--danger); background: rgba(224,92,92,0.1); }
+
+  /* ─── CREAR PERFIL ───────────────────────────── */
+  .create-screen-body {
+    padding: 1.25rem;
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .preview-avatar {
+    margin: 0 auto;
+    width: 80px;
+    height: 80px;
+    font-size: 32px;
+    border: 2px solid var(--border2);
+  }
+  .create-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: var(--sub);
+    margin-bottom: 6px;
+  }
+  .color-grid { display: flex; gap: 10px; flex-wrap: wrap; }
+  .color-opt {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.15s, border-color 0.15s;
+  }
+  .color-opt:hover { transform: scale(1.1); }
+  .color-opt.sel { border-color: white; transform: scale(1.12); }
+
+  /* ─── EDITAR PERFIL ──────────────────────────── */
+  .edit-profile-screen { padding: 1.25rem; flex: 1; overflow-y: auto; }
+
+  /* ─── MODAL ──────────────────────────────────── */
+  .modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: none;
+    z-index: 150;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(3px);
+  }
+  .modal-overlay.open { display: flex; animation: fadeIn 0.2s; }
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius2);
+    padding: 24px;
+    width: 100%;
+    max-width: 320px;
+    animation: modalIn 0.25s cubic-bezier(0.22,1,0.36,1);
+  }
+  @keyframes modalIn {
+    from { opacity:0; transform: scale(0.94); }
+    to   { opacity:1; transform: scale(1); }
+  }
+  .modal h3 { font-size: 16px; color: var(--bright); margin-bottom: 8px; }
+  .modal p  { font-size: 13px; color: var(--sub); line-height: 1.5; margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+  /* ─── ESTADÍSTICAS DE FINANZAS ───────────────── */
+  .fin-filter-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .filter-chip {
+    padding: 5px 12px;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--sub);
+    font-family: var(--font);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .filter-chip.active {
+    background: rgba(78,205,196,0.12);
+    border-color: rgba(78,205,196,0.35);
+    color: var(--accent);
+  }
+
+  /* ─── FAB BUTTON ─────────────────────────────── */
+  .fab {
+    position: absolute;
+    bottom: 80px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(78,205,196,0.4);
+    transition: background 0.15s, transform 0.15s;
+    z-index: 10;
+    font-size: 24px;
+    font-weight: 300;
+  }
+  .fab:hover { background: var(--accent2); transform: scale(1.05); }
+  .fab:active { transform: scale(0.95); }
+
+  /* ─── CONTADOR BADGE ─────────────────────────── */
+  .badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: var(--danger);
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ─── STATS COMPACTAS EN FINANZAS ────────────── */
+  .mini-stats-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .mini-stat {
+    flex: 1;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    text-align: center;
+  }
+  .mini-stat-val { font-size: 15px; font-weight: 600; font-family: var(--mono); color: var(--bright); }
+  .mini-stat-label { font-size: 10px; color: var(--muted); margin-top: 2px; letter-spacing: 0.5px; }
+
+  /* ─── LOADING SCREEN ────────────────────────── */
+  #loading-screen {
+    position: absolute;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 300;
+    gap: 16px;
+  }
+  .loader {
+    width: 36px; height: 36px;
+    border: 3px solid var(--border2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loader-text { font-size: 13px; color: var(--muted); }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- LOADING -->
+  <div id="loading-screen">
+    <div class="loader"></div>
+    <div class="loader-text">Conectando…</div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast"></div>
+
+  <!-- MODAL CONFIRMACIÓN -->
+  <div class="modal-overlay" id="confirm-modal" onclick="handleModalBg(event)">
+    <div class="modal">
+      <h3 id="modal-title">¿Confirmar?</h3>
+      <p id="modal-body">Esta acción no se puede deshacer.</p>
+      <div class="modal-actions">
+        <button class="btn-ghost" onclick="closeModal()">Cancelar</button>
+        <button class="btn-primary" id="modal-confirm-btn" style="background:var(--danger); font-size:13px; padding:9px 18px;">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OVERLAY MENÚ LATERAL -->
+  <div class="overlay" id="overlay" onclick="handleOverlayClick(event)">
+    <div class="side-menu">
+      <h3>Perfiles</h3>
+      <div id="menu-profiles"></div>
+      <hr class="menu-divider">
+      <div class="menu-item" onclick="showCreate();closeOverlay();">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+        Nuevo perfil
+      </div>
+      <hr class="menu-divider">
+      <div id="menu-edit-section"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ HOME ══════════════════════ -->
+  <div class="screen active" id="screen-home">
+    <div class="page-header">
+      <button class="btn-icon" onclick="openMenu()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <span class="page-title">Equipo</span>
+      <div style="width:36px;"></div>
+    </div>
+    <div class="scroll-area">
+      <div class="profiles-grid" id="profiles-grid"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ TASKS ══════════════════════ -->
+  <div class="screen" id="screen-tasks">
+    <div class="task-header">
+      <button class="btn-icon" onclick="goHome()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="profile-mini">
+        <div id="th-avatar" class="avatar" style="width:38px; height:38px; font-size:15px;"></div>
+        <div>
+          <div class="task-header-name" id="th-name"></div>
+          <div class="task-header-sub" id="th-sub"></div>
+        </div>
+      </div>
+      <button class="btn-icon" onclick="openEditProfile()" title="Editar perfil">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
+    </div>
+
+    <div class="view-tabs">
+      <button class="vtab active" id="vtab-daily"   onclick="switchView('daily')">Diaria</button>
+      <button class="vtab"        id="vtab-weekly"  onclick="switchView('weekly')">Semanal</button>
+      <button class="vtab"        id="vtab-monthly" onclick="switchView('monthly')">Mensual</button>
+    </div>
+
+    <div class="scroll-area">
+      <div class="task-body">
+        <div class="quick-row">
+          <input type="text" placeholder="Tarea rápida…" id="quick-input" onkeydown="handleQuickKey(event)"/>
+          <button class="quick-add-btn" onclick="toggleForm()" title="Agregar con opciones">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+        </div>
+
+        <div id="add-form-container" style="display:none;" class="add-form">
+          <input type="text" id="form-title" placeholder="Título de la tarea *"/>
+          <textarea id="form-note" placeholder="Nota (opcional)…" rows="2" style="resize:none;"></textarea>
+          <div class="form-row">
+            <select id="form-priority">
+              <option value="none">Sin prioridad</option>
+              <option value="high">🔴 Alta</option>
+              <option value="med">🟠 Media</option>
+              <option value="low">🟢 Baja</option>
+            </select>
+            <input type="date" id="form-date" style="flex:1"/>
+          </div>
+          <div class="form-actions">
+            <button class="btn-ghost" onclick="cancelForm()">Cancelar</button>
+            <button id="btn-save-task" class="btn-primary" onclick="saveFromForm()">Guardar</button>
+          </div>
+        </div>
+
+        <div id="tasks-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ FINANZAS ══════════════════════ -->
+  <div class="screen" id="screen-finances">
+    <div class="page-header">
+      <span class="page-title">Gastos & Finanzas</span>
+    </div>
+    <div class="scroll-area">
+      <div class="finance-body">
+
+        <div class="balance-card">
+          <div class="balance-label">Balance Total</div>
+          <div class="balance-amount" id="bal-total">$0</div>
+          <div class="balance-row">
+            <div class="bal-stat">
+              <div class="bal-stat-label">Ingresos</div>
+              <div class="bal-stat-val in" id="bal-in">+$0</div>
+            </div>
+            <div class="bal-stat" style="text-align:right;">
+              <div class="bal-stat-label">Gastos</div>
+              <div class="bal-stat-val out" id="bal-out">-$0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mini stats por persona -->
+        <div id="person-stats-row" class="mini-stats-row" style="display:none;"></div>
+
+        <button onclick="toggleFinanceForm()" style="width:100%; padding:13px; background:var(--bg2); border:1px dashed var(--border2); color:var(--accent); border-radius:var(--radius2); margin-bottom:14px; cursor:pointer; font-family:var(--font); font-size:14px; font-weight:600; transition:background 0.15s;">
+          + Nuevo movimiento
+        </button>
+
+        <div id="finance-form" style="display:none;" class="add-form">
+          <div class="form-row">
+            <select id="fin-type">
+              <option value="out">🔴 Gasto</option>
+              <option value="in">🟢 Ingreso</option>
+            </select>
+            <input type="number" id="fin-amount" placeholder="Monto" min="0" step="0.01"/>
+          </div>
+          <input type="text" id="fin-desc" placeholder="Descripción…"/>
+          <div class="form-row">
+            <select id="fin-who"></select>
+            <input type="date" id="fin-date"/>
+          </div>
+          <div class="form-actions">
+            <button class="btn-ghost" onclick="toggleFinanceForm()">Cancelar</button>
+            <button class="btn-primary" onclick="saveFinance()">Guardar</button>
+          </div>
+        </div>
+
+        <div class="fin-section-header">
+          <span class="fin-section-title">Movimientos</span>
+        </div>
+
+        <div class="fin-filter-bar" id="fin-filter-bar"></div>
+
+        <div class="tx-list" id="finance-list">
+          <div style="text-align:center; padding:30px 20px; font-size:13px; color:var(--muted);">No hay movimientos.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ CREAR PERFIL ══════════════════════ -->
+  <div class="screen" id="screen-create">
+    <div class="page-header">
+      <button class="btn-icon" onclick="goHome()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <span class="page-title">Nuevo Perfil</span>
+      <div style="width:36px;"></div>
+    </div>
+    <div class="create-screen-body">
+      <div id="create-preview" class="avatar preview-avatar">?</div>
+      <div>
+        <div class="create-label">Nombre</div>
+        <input type="text" id="create-name" placeholder="Ej: Darío" oninput="updatePreview()"/>
+      </div>
+      <div>
+        <div class="create-label">Color de avatar</div>
+        <div class="color-grid" id="color-grid"></div>
+      </div>
+      <button class="btn-primary" onclick="createProfile()" style="width:100%; padding:14px; font-size:15px; margin-top:auto;">Crear perfil</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ EDITAR PERFIL ══════════════════════ -->
+  <div class="screen" id="screen-edit-profile">
+    <div class="page-header">
+      <button class="btn-icon" onclick="cancelEditProfile()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <span class="page-title">Editar Perfil</span>
+      <div style="width:36px;"></div>
+    </div>
+    <div class="create-screen-body">
+      <div id="edit-preview" class="avatar preview-avatar">?</div>
+      <div>
+        <div class="create-label">Nombre</div>
+        <input type="text" id="edit-name" placeholder="Ej: Darío" oninput="updateEditPreview()"/>
+      </div>
+      <div>
+        <div class="create-label">Color de avatar</div>
+        <div class="color-grid" id="edit-color-grid"></div>
+      </div>
+      <button class="btn-primary" onclick="saveEditProfile()" style="width:100%; padding:14px; font-size:15px; margin-top:auto;">Guardar cambios</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ BOTTOM NAV ══════════════════════ -->
+  <div class="bottom-nav" id="bottom-nav">
+    <button class="nav-btn active" id="nav-home" onclick="goHome()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Inicio
+    </button>
+    <button class="nav-btn" id="nav-fin" onclick="openFinances()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      Gastos
+    </button>
+  </div>
+
+</div><!-- .app -->
+
+
+<!-- Firebase SDKs -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* ─── FIREBASE CONFIG ─────────────────────────── */
+const firebaseConfig = {
+  apiKey: "AIzaSyD8_4_FYlKC5BNicbY0ESlzKyKAi4BbOxs",
+  authDomain: "equipo-tareas.firebaseapp.com",
+  projectId: "equipo-tareas",
+  storageBucket: "equipo-tareas.firebasestorage.app",
+  messagingSenderId: "394882250687",
+  appId: "1:394882250687:web:22baa7610dd4b3116f130a",
+  measurementId: "G-WHP89LKPNL"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+const DOC_PROFILES = doc(db, 'equipo', 'profiles');
+const DOC_FINANCES = doc(db, 'equipo', 'finances');
+
+/* ─── DATOS ──────────────────────────────────── */
+const COLORS = [
+  {bg:'#1B4F5C', text:'#9EC8D3'},
+  {bg:'#2D6A4F', text:'#95D5B2'},
+  {bg:'#5C4033', text:'#D4A090'},
+  {bg:'#3D3D6B', text:'#A0A0D5'},
+  {bg:'#5C4A1E', text:'#D4BF80'},
+  {bg:'#1E4D5C', text:'#80C4D4'},
+  {bg:'#4A1E5C', text:'#C080D4'},
+  {bg:'#1E5C2D', text:'#80D490'},
+];
+
+let profiles = [];
+let finances = [];
+let viewingProfile = null;
+let currentView = 'daily';
+let selectedColor = 0;
+let editingTaskId = null;
+let editSelectedColor = 0;
+let financeFilter = 'all';
+let pendingConfirm = null;
+let isSaving = false;
+let saveQueue = false;
+
+/* ─── FIREBASE SYNC ──────────────────────────── */
+async function load() {
+  showLoading(true);
+  try {
+    // Cargar datos iniciales
+    const [pSnap, fSnap] = await Promise.all([
+      getDoc(DOC_PROFILES),
+      getDoc(DOC_FINANCES)
+    ]);
+
+    if(pSnap.exists()) {
+      profiles = pSnap.data().list;
+    } else {
+      profiles = [
+        {id:1, name:'Darío',  colorIdx:0, tasks:{monthly:[],weekly:[],daily:[]}},
+        {id:2, name:'Tania', colorIdx:2, tasks:{monthly:[],weekly:[],daily:[]}}
+      ];
+      await setDoc(DOC_PROFILES, {list: profiles});
+    }
+
+    if(fSnap.exists()) {
+      finances = fSnap.data().list;
+    } else {
+      finances = [];
+      await setDoc(DOC_FINANCES, {list: []});
+    }
+
+    renderHome();
+    showLoading(false);
+
+    // Escuchar cambios en tiempo real
+    onSnapshot(DOC_PROFILES, (snap) => {
+      if(!snap.exists() || isSaving) return;
+      const newProfiles = snap.data().list;
+      profiles = newProfiles;
+      // Actualizar viewingProfile si está abierto
+      if(viewingProfile) {
+        const updated = profiles.find(p => p.id === viewingProfile.id);
+        if(updated) {
+          viewingProfile = updated;
+          updateTaskHeader();
+          renderTasks();
+        }
+      }
+      renderHome();
+      showToast('🔄 Datos actualizados');
+    });
+
+    onSnapshot(DOC_FINANCES, (snap) => {
+      if(!snap.exists() || isSaving) return;
+      finances = snap.data().list;
+      const finScreen = document.getElementById('screen-finances');
+      if(finScreen.classList.contains('active')) renderFinances();
+      renderHome();
+      showToast('🔄 Finanzas actualizadas');
+    });
+
+  } catch(e) {
+    showLoading(false);
+    showToast('❌ Error de conexión');
+    console.error(e);
+  }
+}
+
+async function save() {
+  if(isSaving) { saveQueue = true; return; }
+  isSaving = true;
+  try {
+    await Promise.all([
+      setDoc(DOC_PROFILES, {list: profiles}),
+      setDoc(DOC_FINANCES, {list: finances})
+    ]);
+  } catch(e) {
+    showToast('❌ Error al guardar');
+    console.error(e);
+  }
+  isSaving = false;
+  if(saveQueue) { saveQueue = false; save(); }
+}
+
+function showLoading(on) {
+  document.getElementById('loading-screen').style.display = on ? 'flex' : 'none';
+}
+
+/* ─── TOAST ──────────────────────────────────── */
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ─── MODAL ──────────────────────────────────── */
+function openModal(title, body, onConfirm, confirmLabel = 'Eliminar', danger = true) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').textContent = body;
+  const btn = document.getElementById('modal-confirm-btn');
+  btn.textContent = confirmLabel;
+  btn.style.background = danger ? 'var(--danger)' : 'var(--accent)';
+  pendingConfirm = onConfirm;
+  btn.onclick = () => { onConfirm(); closeModal(); };
+  document.getElementById('confirm-modal').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('confirm-modal').classList.remove('open');
+  pendingConfirm = null;
+}
+function handleModalBg(e) { if(e.target.id === 'confirm-modal') closeModal(); }
+
+/* ─── NAVEGACIÓN ─────────────────────────────── */
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  const nav = document.getElementById('bottom-nav');
+  nav.style.display = ['create','edit-profile'].includes(name) ? 'none' : 'flex';
+  document.getElementById('nav-home').classList.toggle('active', name === 'home' || name === 'tasks');
+  document.getElementById('nav-fin').classList.toggle('active', name === 'finances');
+}
+function goHome() { showScreen('home'); renderHome(); }
+function openFinances() { showScreen('finances'); populateWhoSelect(); renderFinances(); }
+
+/* ─── HOME ───────────────────────────────────── */
+function renderHome() {
+  const grid = document.getElementById('profiles-grid');
+  grid.innerHTML = profiles.map(p => {
+    const c = COLORS[p.colorIdx];
+    const all = Object.values(p.tasks).flat();
+    const done = all.filter(t => t.done).length;
+    const pending = all.filter(t => !t.done).length;
+    const pct = all.length ? Math.round(done/all.length*100) : 0;
+    return `
+      <div class="profile-card" onclick="openProfile(${p.id})">
+        <div class="avatar" style="background:${c.bg};color:${c.text}">${p.name[0].toUpperCase()}</div>
+        <div class="profile-name">${p.name}</div>
+        <div class="profile-stats">${pending} pendiente${pending!==1?'s':''}</div>
+        <div class="progress-bar" style="width:80%">
+          <div class="progress-fill" style="width:${pct}%"></div>
+        </div>
+      </div>`;
+  }).join('') + `
+    <div class="profile-card add-card" onclick="showCreate()">
+      <div class="avatar" style="border:1.5px dashed var(--border2);font-size:26px;color:var(--muted);">+</div>
+      <div class="profile-name" style="color:var(--muted)">Nuevo</div>
+    </div>`;
+
+  document.getElementById('menu-profiles').innerHTML = profiles.map(p => {
+    const c = COLORS[p.colorIdx];
+    return `<div class="menu-item" onclick="openProfile(${p.id});closeOverlay()">
+      <div class="avatar" style="width:28px;height:28px;font-size:12px;background:${c.bg};color:${c.text}">${p.name[0].toUpperCase()}</div>
+      ${p.name}
+    </div>`;
+  }).join('');
+
+  document.getElementById('menu-edit-section').innerHTML = profiles.map(p => `
+    <div class="menu-item danger" onclick="confirmDeleteProfile(${p.id})">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+      Eliminar a ${p.name}
+    </div>`).join('');
+}
+
+function openMenu() { document.getElementById('overlay').classList.add('open'); }
+function closeOverlay() { document.getElementById('overlay').classList.remove('open'); }
+function handleOverlayClick(e) { if(e.target.id==='overlay') closeOverlay(); }
+
+/* ─── PERFIL ─────────────────────────────────── */
+function openProfile(id) {
+  viewingProfile = profiles.find(p => p.id === id);
+  currentView = 'daily';
+  editingTaskId = null;
+  updateTaskHeader();
+  switchView(currentView);
+  showScreen('tasks');
+}
+function updateTaskHeader() {
+  const c = COLORS[viewingProfile.colorIdx];
+  const av = document.getElementById('th-avatar');
+  av.textContent = viewingProfile.name[0].toUpperCase();
+  av.style.background = c.bg; av.style.color = c.text;
+  document.getElementById('th-name').textContent = viewingProfile.name;
+  const all = Object.values(viewingProfile.tasks).flat();
+  document.getElementById('th-sub').textContent = `${all.filter(t=>t.done).length}/${all.length} completadas`;
+}
+function confirmDeleteProfile(id) {
+  const p = profiles.find(x => x.id === id);
+  openModal(`Eliminar a ${p.name}`, 'Se eliminarán todas sus tareas. Esta acción no se puede deshacer.', async () => {
+    profiles = profiles.filter(x => x.id !== id);
+    await save(); renderHome(); closeOverlay();
+    showToast(`Perfil de ${p.name} eliminado`);
+  });
+}
+
+/* ─── EDITAR PERFIL ──────────────────────────── */
+function openEditProfile() {
+  editSelectedColor = viewingProfile.colorIdx;
+  document.getElementById('edit-name').value = viewingProfile.name;
+  document.getElementById('edit-color-grid').innerHTML = COLORS.map((c,i) =>
+    `<div class="color-opt ${i===editSelectedColor?'sel':''}" style="background:${c.bg}" onclick="selectEditCol(${i},this)"></div>`
+  ).join('');
+  updateEditPreview(); showScreen('edit-profile');
+}
+function cancelEditProfile() { showScreen('tasks'); }
+function updateEditPreview() {
+  const n = document.getElementById('edit-name').value || '?';
+  const c = COLORS[editSelectedColor];
+  const p = document.getElementById('edit-preview');
+  p.textContent = n[0].toUpperCase(); p.style.background = c.bg; p.style.color = c.text;
+}
+function selectEditCol(i, el) {
+  editSelectedColor = i;
+  document.querySelectorAll('#edit-color-grid .color-opt').forEach(o => o.classList.remove('sel'));
+  el.classList.add('sel'); updateEditPreview();
+}
+async function saveEditProfile() {
+  const name = document.getElementById('edit-name').value.trim();
+  if(!name) { showToast('El nombre no puede estar vacío'); return; }
+  viewingProfile.name = name; viewingProfile.colorIdx = editSelectedColor;
+  await save(); updateTaskHeader(); showScreen('tasks');
+  showToast('Perfil actualizado');
+}
+
+/* ─── CREAR PERFIL ───────────────────────────── */
+function showCreate() {
+  selectedColor = 0;
+  document.getElementById('create-name').value = '';
+  document.getElementById('color-grid').innerHTML = COLORS.map((c,i) =>
+    `<div class="color-opt ${i===0?'sel':''}" style="background:${c.bg}" onclick="selectCol(${i},this)"></div>`
+  ).join('');
+  updatePreview(); showScreen('create');
+}
+function selectCol(i, el) {
+  selectedColor = i;
+  document.querySelectorAll('#color-grid .color-opt').forEach(o => o.classList.remove('sel'));
+  el.classList.add('sel'); updatePreview();
+}
+function updatePreview() {
+  const n = document.getElementById('create-name').value || '?';
+  const c = COLORS[selectedColor];
+  const p = document.getElementById('create-preview');
+  p.textContent = n[0].toUpperCase(); p.style.background = c.bg; p.style.color = c.text;
+}
+async function createProfile() {
+  const name = document.getElementById('create-name').value.trim();
+  if(!name) { showToast('Escribí un nombre'); return; }
+  profiles.push({id: Date.now(), name, colorIdx: selectedColor, tasks:{monthly:[],weekly:[],daily:[]}});
+  await save(); goHome();
+  showToast(`Perfil de ${name} creado`);
+}
+
+/* ─── TAREAS ─────────────────────────────────── */
+function switchView(v) {
+  currentView = v;
+  document.querySelectorAll('.vtab').forEach(b => b.classList.toggle('active', b.id === 'vtab-' + v));
+  document.getElementById('add-form-container').style.display = 'none';
+  editingTaskId = null;
+  renderTasks();
+}
+function renderTasks() {
+  const list = document.getElementById('tasks-list');
+  const tasks = viewingProfile.tasks[currentView];
+  const sorted = [...tasks].sort((a,b) => {
+    if(a.done !== b.done) return a.done ? 1 : -1;
+    const p = {high:0,med:1,low:2,none:3};
+    return p[a.priority] - p[b.priority];
+  });
+  if(sorted.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">✓</div><p>Sin tareas en esta vista.<br>Agregá una arriba.</p></div>`;
+    return;
+  }
+  const today = new Date().toISOString().split('T')[0];
+  list.innerHTML = sorted.map(t => {
+    const c = COLORS[viewingProfile.colorIdx];
+    const prio = t.priority !== 'none' ? `<span class="tag tag-${t.priority}">${t.priority==='high'?'ALTA':t.priority==='med'?'MEDIA':'BAJA'}</span>` : '';
+    let dateHtml = '';
+    if(t.dueDate) {
+      const overdue = !t.done && t.dueDate < today;
+      dateHtml = `<span class="date-tag ${overdue?'overdue':''}">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        ${formatDate(t.dueDate)}${overdue?' · vencida':''}
+      </span>`;
+    }
+    const noteHtml = t.note ? `<div class="task-note">${escHtml(t.note)}</div>` : '';
+    return `
+    <div class="task-item ${t.done?'done':''}">
+      <div class="chk" style="${t.done?`background:${c.bg};border-color:${c.bg}`:''}" onclick="toggleTask(${t.id})">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="${c.text}" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="task-content">
+        <div class="task-title">${escHtml(t.text)}</div>
+        ${noteHtml}
+        <div class="task-meta">${prio}${dateHtml}</div>
+      </div>
+      <div class="task-actions">
+        <button class="task-btn" onclick="prepareEdit(${t.id})">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="task-btn del" onclick="confirmDeleteTask(${t.id})">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+  updateTaskHeader();
+}
+async function toggleTask(id) {
+  const t = viewingProfile.tasks[currentView].find(x => x.id === id);
+  t.done = !t.done;
+  await save(); renderTasks();
+  if(t.done) showToast('Tarea completada ✓');
+}
+function confirmDeleteTask(id) {
+  const t = viewingProfile.tasks[currentView].find(x => x.id === id);
+  openModal('Eliminar tarea', `"${t.text}" se eliminará permanentemente.`, async () => {
+    viewingProfile.tasks[currentView] = viewingProfile.tasks[currentView].filter(x => x.id !== id);
+    await save(); renderTasks(); showToast('Tarea eliminada');
+  });
+}
+function handleQuickKey(e) { if(e.key==='Enter') addQuick(); }
+async function addQuick() {
+  const inp = document.getElementById('quick-input');
+  const text = inp.value.trim();
+  if(!text) return;
+  viewingProfile.tasks[currentView].push({id:Date.now(),text,done:false,priority:'none',dueDate:'',note:''});
+  inp.value = '';
+  await save(); renderTasks(); showToast('Tarea agregada');
+}
+function toggleForm() {
+  const f = document.getElementById('add-form-container');
+  const isHidden = f.style.display === 'none';
+  f.style.display = isHidden ? 'grid' : 'none';
+  if(isHidden && !editingTaskId) clearForm();
+  if(isHidden) document.getElementById('form-title').focus();
+}
+function cancelForm() { document.getElementById('add-form-container').style.display='none'; editingTaskId=null; }
+function clearForm() {
+  document.getElementById('form-title').value=''; document.getElementById('form-note').value='';
+  document.getElementById('form-priority').value='none'; document.getElementById('form-date').value='';
+  document.getElementById('btn-save-task').textContent='Guardar';
+}
+function prepareEdit(id) {
+  const t = viewingProfile.tasks[currentView].find(x => x.id === id);
+  editingTaskId = id;
+  document.getElementById('form-title').value = t.text;
+  document.getElementById('form-note').value = t.note||'';
+  document.getElementById('form-priority').value = t.priority;
+  document.getElementById('form-date').value = t.dueDate||'';
+  document.getElementById('btn-save-task').textContent = 'Actualizar';
+  if(document.getElementById('add-form-container').style.display==='none') toggleForm();
+  document.getElementById('form-title').focus();
+}
+async function saveFromForm() {
+  const title = document.getElementById('form-title').value.trim();
+  if(!title) { showToast('Escribí un título'); return; }
+  const data = {text:title, note:document.getElementById('form-note').value.trim(), priority:document.getElementById('form-priority').value, dueDate:document.getElementById('form-date').value};
+  if(editingTaskId) {
+    Object.assign(viewingProfile.tasks[currentView].find(x=>x.id===editingTaskId), data);
+    showToast('Tarea actualizada');
+  } else {
+    viewingProfile.tasks[currentView].push({id:Date.now(),done:false,...data});
+    showToast('Tarea agregada');
+  }
+  editingTaskId = null; cancelForm();
+  await save(); renderTasks();
+}
+
+/* ─── FINANZAS ───────────────────────────────── */
+function populateWhoSelect() {
+  const sel = document.getElementById('fin-who');
+  sel.innerHTML = `<option value="common">Fondo Común</option>` +
+    profiles.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+}
+function toggleFinanceForm() {
+  const f = document.getElementById('finance-form');
+  const isHidden = f.style.display==='none';
+  f.style.display = isHidden ? 'grid' : 'none';
+  if(isHidden) {
+    populateWhoSelect();
+    document.getElementById('fin-amount').value='';
+    document.getElementById('fin-desc').value='';
+    document.getElementById('fin-date').value=new Date().toISOString().split('T')[0];
+    document.getElementById('fin-amount').focus();
+  }
+}
+async function saveFinance() {
+  const amount = parseFloat(document.getElementById('fin-amount').value);
+  const desc = document.getElementById('fin-desc').value.trim();
+  if(!amount||amount<=0) { showToast('Ingresá un monto válido'); return; }
+  if(!desc) { showToast('Escribí una descripción'); return; }
+  finances.push({
+    id: Date.now(),
+    type: document.getElementById('fin-type').value,
+    amount, desc,
+    whoId: document.getElementById('fin-who').value,
+    date: document.getElementById('fin-date').value||new Date().toISOString().split('T')[0]
+  });
+  await save(); toggleFinanceForm(); renderFinances();
+  showToast('Movimiento guardado');
+}
+function deleteFinance(id) {
+  openModal('Eliminar movimiento','¿Eliminás este registro?', async () => {
+    finances = finances.filter(f=>f.id!==id);
+    await save(); renderFinances(); showToast('Movimiento eliminado');
+  });
+}
+function renderFinances() {
+  let totalIn=0, totalOut=0;
+  finances.forEach(f => { if(f.type==='in') totalIn+=f.amount; else totalOut+=f.amount; });
+  const balance = totalIn - totalOut;
+  const balEl = document.getElementById('bal-total');
+  balEl.textContent = '$'+formatAmount(Math.abs(balance));
+  balEl.className = 'balance-amount '+(balance>=0?'positive':'negative');
+  document.getElementById('bal-in').textContent  = '+$'+formatAmount(totalIn);
+  document.getElementById('bal-out').textContent = '-$'+formatAmount(totalOut);
+
+  const statsRow = document.getElementById('person-stats-row');
+  if(finances.length>0) {
+    statsRow.style.display='flex';
+    statsRow.innerHTML = profiles.map(p => {
+      const pOut = finances.filter(f=>f.type==='out'&&String(f.whoId)===String(p.id)).reduce((s,f)=>s+f.amount,0);
+      return `<div class="mini-stat"><div class="mini-stat-val">$${formatAmount(pOut)}</div><div class="mini-stat-label">${p.name}</div></div>`;
+    }).join('');
+  } else { statsRow.style.display='none'; }
+
+  const filterBar = document.getElementById('fin-filter-bar');
+  filterBar.innerHTML = [
+    {id:'all',label:'Todos'},
+    ...profiles.map(p=>({id:String(p.id),label:p.name})),
+    {id:'common',label:'Común'}
+  ].map(f=>`<button class="filter-chip ${financeFilter===f.id?'active':''}" onclick="setFinFilter('${f.id}')">${f.label}</button>`).join('');
+
+  let filtered = [...finances];
+  if(financeFilter!=='all') filtered=filtered.filter(f=>String(f.whoId)===financeFilter);
+  filtered.reverse();
+
+  const list = document.getElementById('finance-list');
+  if(filtered.length===0) {
+    list.innerHTML=`<div style="text-align:center;padding:30px 20px;font-size:13px;color:var(--muted);">Sin movimientos en este filtro.</div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(f => {
+    const profile = profiles.find(p=>String(p.id)===String(f.whoId));
+    const whoName = profile?profile.name:'Común';
+    const isOut = f.type==='out';
+    return `
+    <div class="tx-item">
+      <div class="tx-dot ${isOut?'out':'in'}"></div>
+      <div class="tx-info">
+        <div class="tx-desc">${escHtml(f.desc)}</div>
+        <div class="tx-meta">${isOut?'Pagó':'Aportó'}: ${whoName} · ${formatDate(f.date)}</div>
+      </div>
+      <div class="tx-amount ${isOut?'out':'in'}">${isOut?'-':'+'}$${formatAmount(f.amount)}</div>
+      <button class="tx-del" onclick="deleteFinance(${f.id})">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+      </button>
+    </div>`;
+  }).join('');
+}
+function setFinFilter(id) { financeFilter=id; renderFinances(); }
+
+/* ─── HELPERS ────────────────────────────────── */
+function formatAmount(n) { return n.toLocaleString('es-AR',{minimumFractionDigits:n%1!==0?2:0}); }
+function formatDate(iso) { if(!iso) return ''; const [y,m,d]=iso.split('-'); return `${d}/${m}/${y}`; }
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+load();
+</script>
+</body>
+</html>
